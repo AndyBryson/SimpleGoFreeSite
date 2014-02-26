@@ -51,7 +51,6 @@ function InitWebsocket( url )
 
 function onWebsocketConnect()
 {
-    alert("connect");
     var obj = {};
     var arrayOfRequests = [];
     arrayOfRequests.push({ // push as much as you want into here
@@ -61,6 +60,8 @@ function onWebsocketConnect()
     obj.DataReq = arrayOfRequests;
     var stringToSend = JSON.stringify(obj);
     websocketConnection.send( stringToSend );
+
+    websocketConnection.send('{"EventReg":[17]}');
 }
 
 function onWebsocketClose()
@@ -70,7 +71,6 @@ function onWebsocketClose()
 
 function onWebsocketMessage( incoming )
 {
-    alert(incoming);
     var javascriptObject = JSON.parse( incoming );
     if( javascriptObject.hasOwnProperty("Data"))
     {
@@ -89,4 +89,46 @@ function onWebsocketMessage( incoming )
 
         }
     }
+    else if( javascriptObject.hasOwnProperty("EventSet") )
+    {
+        alert( incoming );
+        var eventArray = javascriptObject.EventSet;
+        for( var i = 0; i < eventArray.length; i++ )
+        {
+            var event = eventArray[i];
+            if( event.id === 17 )
+            {
+                alert( "It's here: " + event.variant.location );
+            }
+        }
+    }
+    else
+    {
+        alert( incoming );
+    }
 }
+
+function GetBoatSpeed()
+{
+    var obj = {};
+    var arrayOfRequests = [];
+    arrayOfRequests.push({ // push as much as you want into here
+        "id":42, // 42 is boatspeed                                                                             
+        "repeat":false
+    });
+    obj.DataReq = arrayOfRequests;
+    var stringToSend = JSON.stringify(obj);
+    websocketConnection.send( stringToSend );
+}
+
+function GetBackup()
+{
+    var backupId = 17;
+    var obj = {};
+    var arrayOfEvents = [ { "id" : backupId, "action" : "request" } ];
+
+    obj.EventSet = arrayOfEvents;
+    var stringToSend = JSON.stringify(obj);
+    websocketConnection.send( stringToSend );
+}
+
