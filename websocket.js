@@ -55,7 +55,7 @@ function onWebsocketConnect()
     var obj = {};
     var arrayOfRequests = [];
     arrayOfRequests.push({ // push as much as you want into here
-        "id":42,                                                                              
+        "id":42, // 42 is boatspeed                                                                             
         "repeat":false
     });
     obj.DataReq = arrayOfRequests;
@@ -68,16 +68,25 @@ function onWebsocketClose()
     alert("close");
 }
 
-function onWebsocketMessage( data )
+function onWebsocketMessage( incoming )
 {
-    alert(data);
-    var javascriptObject = JSON.parse( data );
-    if( javascriptObject.valid === true )
+    alert(incoming);
+    var javascriptObject = JSON.parse( incoming );
+    if( javascriptObject.hasOwnProperty("Data"))
     {
-        alert(javascriptObject.val);
-    }
-    else
-    {
-        alert(javascriptObject.val);
+        var dataArray = javascriptObject.Data;
+        for( var i = 0; i < dataArray.length; i++ )
+        {
+            var data = dataArray[i];
+            if( data.valid === false )
+            {
+                alert(data.id + " : invalid");
+            }
+            else
+            {
+                alert(data.id + " : " + data.val);
+            } 
+
+        }
     }
 }
